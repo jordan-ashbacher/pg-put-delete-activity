@@ -66,4 +66,16 @@ function renderBooks(books) {
 
 function deleteBook() {
   console.log('delete button clicked')
+  const id = $(this).closest('tr').data('id')
+
+  $.ajax({
+    type: 'DELETE',
+    url: `/books/${id}`
+  }).then(function (response) {
+    refreshBooks()
+  }).catch(function (err) {
+    console.log('error in delete')
+  })
+
+
 }
