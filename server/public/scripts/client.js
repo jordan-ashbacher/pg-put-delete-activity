@@ -7,6 +7,7 @@ $(document).ready(function(){
 function addClickHandlers() {
   $('#submitBtn').on('click', handleSubmit);
   $('#bookShelf').on('click', '.delete-btn', deleteBook)
+  $('#bookShelf').on('click', '.status-btn', updateStatus)
 
   // TODO - Add code for edit & delete buttons
 }
@@ -59,6 +60,8 @@ function renderBooks(books) {
     $tr.data('book', book);
     $tr.append(`<td>${book.title}</td>`);
     $tr.append(`<td>${book.author}</td>`);
+    $tr.append(`<td class="status">${book.status}</td>`);
+    $tr.append(`<button class='status-btn'>UPDATE STATUS</button>`)
     $tr.append(`<button class='delete-btn'>DELETE</button>`)
     $('#bookShelf').append($tr);
   }
@@ -74,8 +77,27 @@ function deleteBook() {
   }).then(function (response) {
     refreshBooks()
   }).catch(function (err) {
-    console.log('error in delete')
+    console.log('error deleting book')
   })
+}
 
+function updateStatus() {
+  console.log('status button clicked')
+  const id = $(this).closest('tr').data('id')
+  const currentStatus = $(this).siblings('td.status').text()
+  console.log(currentStatus)
+  const dataToSend = {
+    status: currentStatus
+  }
+
+  $.ajax({
+    type: 'PUT',
+    url: `/books/${id}`,
+    data: dataToSend
+  }).then(function (response) {
+    refreshBooks()
+  }).catch(function (err) {
+    alert('error changing status')
+  })
 
 }
