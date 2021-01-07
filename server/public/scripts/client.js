@@ -8,8 +8,34 @@ function addClickHandlers() {
   $('#submitBtn').on('click', handleSubmit);
   $('#bookShelf').on('click', '.delete-btn', deleteBook)
   $('#bookShelf').on('click', '.status-btn', updateStatus)
+  $('#bookShelf').on('click', '.edit-btn', editMode)
+  $('#input-section').on('click', '#cancel-btn', cancelEdit)
 
   // TODO - Add code for edit & delete buttons
+}
+
+let bookId
+let currentMode = 'add'
+
+function editMode() {
+  console.log('clicked edit book')
+  bookId = $(this).closest('tr').data('id')
+  console.log(bookId)
+  currentMode = 'edit'
+
+  $('#title').val($(this).siblings('td.title').text())
+  $('#author').val($(this).siblings('td.author').text())
+  $('#input-header').text('Edit Book')
+  $('#input-section').append(`<button type="button" id="cancel-btn">Cancel</button>`)
+}
+
+function cancelEdit() {
+  console.log('clicked cancel')
+  currentMode = 'add'
+  $('#title').val('')
+  $('#author').val('')
+  $('#input-header').text('Add New Book')
+  $('#cancel-btn').remove()
 }
 
 function handleSubmit() {
@@ -17,7 +43,25 @@ function handleSubmit() {
   let book = {};
   book.author = $('#author').val();
   book.title = $('#title').val();
-  addBook(book);
+  if (currentMode === 'add') {
+    addBook(book);
+  } else if (currentMode === 'edit') {
+    editBook(book)
+  }
+  
+}
+
+function editBook(bookToEdit) {
+  console.log('book to edit', bookToEdit)
+  $.ajax({
+    type: 'PUT',
+    url: `/books/edit/${bookId}`,
+    data: bookToEdit
+  }).then(function (response) {
+    refreshBooks()
+  }).catch(function (err) {
+    alert('error editing book')
+  })
 }
 
 // adds a book to the database
@@ -58,10 +102,11 @@ function renderBooks(books) {
     // For each book, append a new row to our table
     let $tr = $(`<tr data-id=${book.id}></tr>`);
     $tr.data('book', book);
-    $tr.append(`<td>${book.title}</td>`);
-    $tr.append(`<td>${book.author}</td>`);
+    $tr.append(`<td class="title">${book.title}</td>`);
+    $tr.append(`<td class="author">${book.author}</td>`);
     $tr.append(`<td class="status">${book.status}</td>`);
     $tr.append(`<button class='status-btn'>UPDATE STATUS</button>`)
+    $tr.append(`<button class='edit-btn'>EDIT</button>`)
     $tr.append(`<button class='delete-btn'>DELETE</button>`)
     $('#bookShelf').append($tr);
   }
