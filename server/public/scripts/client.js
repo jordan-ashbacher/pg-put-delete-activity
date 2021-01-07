@@ -47,6 +47,7 @@ function handleSubmit() {
     addBook(book);
   } else if (currentMode === 'edit') {
     editBook(book)
+    cancelEdit()
   }
   
 }

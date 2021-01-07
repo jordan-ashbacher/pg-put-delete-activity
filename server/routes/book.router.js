@@ -62,6 +62,26 @@ router.put('/:id',  (req, res) => {
 
 });
 
+router.put('/edit/:id', (req, res) => {
+  console.log(req.body)
+  let id = req.params.id
+  let title = req.body.title
+  let author = req.body.author
+
+  let queryText = `UPDATE books 
+  SET title = '${title}', author = '${author}' 
+  WHERE id = $1`
+
+  pool.query(queryText, [id])
+  .then((result) => {
+    res.sendStatus(200)
+  }).catch((err) => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+
+})
+
 // TODO - DELETE 
 // Removes a book to show that it has been read
 // Request must include a parameter indicating what book to update - the id
